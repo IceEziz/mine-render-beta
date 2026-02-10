@@ -13,7 +13,7 @@ jobs:
       - name: Dosyalari Cek
         uses: actions/checkout@v4
 
-      - name: Yeni Nesil Grafik ve Wine Kur
+      - name: Grafik ve Wine Kur
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
@@ -24,11 +24,10 @@ jobs:
           unzip mine_motor.zip -d engine
           chmod -R 777 engine
 
-      - name: Sanal Ekrani Atesle ve Test Et
+      - name: Sanal Ekrani Atesle
         run: |
           Xvfb :99 -screen 0 1280x1024x24 &
           export DISPLAY=:99
           export LIBGL_ALWAYS_SOFTWARE=1
           sleep 5
-          # Motorun yardim komutunu calistirip calismadigina bakiyoruz
           wine64 engine/Mine-imator.exe --help
