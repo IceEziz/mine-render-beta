@@ -17,30 +17,32 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y wine64 wine32 xvfb libgl1 libglx-mesa0 libosmesa6 mesa-utils unzip
+          sudo apt-get install -y wine64 wine32 xvfb libgl1 libglx-mesa0 libosmesa6 mesa-utils unzip imagemagick
 
       - name: Motoru ve Modeli Hazirla
         run: |
-          # Motoru ac
           unzip mine_motor.zip -d engine
-          
-          # Atahan Brine Modelini ac
           unzip "Atahan Brine Model_102758.zip" -d assets
-          
           chmod -R 777 engine
-          chmod -R 777 assets
 
-      - name: Render Denemesi
+      - name: Motoru Baslat ve Foto Cek
         run: |
           Xvfb :99 -screen 0 1280x1024x24 &
           export DISPLAY=:99
           export LIBGL_ALWAYS_SOFTWARE=1
-          sleep 5
           
-          # Artik miobject dosyasinin yolu tam olarak surada:
-          # assets/Atahan Brine Model/Squared Media Animation.miobject
+          # Mine-imator'u arka planda baslat
+          wine64 engine/Mine-imator.exe &
           
-          echo "Model dosyasi hazir: assets/Atahan Brine Model/Squared Media Animation.miobject"
+          echo "Motorun acilmasi icin 60 saniye bekleniyor..."
+          sleep 60
           
-          # Simdilik sadece motorun saglik durumunu kontrol ediyoruz
-          wine64 engine/Mine-imator.exe --help || echo "Motor hazir, render emri beklenebilir!"
+          # Ekran goruntusu al (import komutu imagemagick ile gelir)
+          import -window root ekran_goruntusu.png
+          echo "Fotoğraf cekildi!"
+
+      - name: Fotografi Yukle
+        uses: actions/upload-artifact@v4
+        with:
+          name: mine-imator-ekran
+          path: ekran_goruntusu.png
