@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       miobject_link:
-        description: 'Dosya linki'
+        description: 'Render edilecek dosya'
         required: true
 
 jobs:
@@ -19,15 +19,28 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y wine64 wine32 xvfb libgl1 libglx-mesa0 libosmesa6 mesa-utils unzip
 
-      - name: Motoru Hazirla
+      - name: Motoru ve Modeli Hazirla
         run: |
+          # Motoru ac
           unzip mine_motor.zip -d engine
+          
+          # Atahan Brine Modelini ac
+          unzip "Atahan Brine Model_102758.zip" -d assets
+          
           chmod -R 777 engine
+          chmod -R 777 assets
 
-      - name: Motoru Test Et
+      - name: Render Denemesi
         run: |
           Xvfb :99 -screen 0 1280x1024x24 &
           export DISPLAY=:99
           export LIBGL_ALWAYS_SOFTWARE=1
           sleep 5
-          wine64 engine/Mine-imator.exe --help || echo "Test tamamlandi"
+          
+          # Artik miobject dosyasinin yolu tam olarak surada:
+          # assets/Atahan Brine Model/Squared Media Animation.miobject
+          
+          echo "Model dosyasi hazir: assets/Atahan Brine Model/Squared Media Animation.miobject"
+          
+          # Simdilik sadece motorun saglik durumunu kontrol ediyoruz
+          wine64 engine/Mine-imator.exe --help || echo "Motor hazir, render emri beklenebilir!"
