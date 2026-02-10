@@ -3,30 +3,31 @@ on:
   workflow_dispatch:
     inputs:
       miobject_link:
-        description: 'Render edilecek dosyanın linki'
+        description: 'Render edilecek dosya'
         required: true
 
 jobs:
   render_job:
     runs-on: ubuntu-latest
     steps:
-      - name: Kodları ve Motoru Çek
+      - name: Dosyalari Cek
         uses: actions/checkout@v4
 
-      - name: Wine ve Ekran Taklitçisi Kur (Xvfb)
+      - name: Grafik ve Wine Gucunu Yukle
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          sudo apt-get install -y wine64 xvfb libgl1-mesa-glx mesa-utils unzip
-
-      - name: Motoru Hazırla
+          sudo apt-get install -y --install-recommends wine64 wine32 xvfb libgl1-mesa-dri libgl1-mesa-glx libosmesa6
+          
+      - name: Motoru Hazirla
         run: |
           unzip mine_motor.zip -d engine
           chmod -R 777 engine
 
-      - name: Render'ı Başlat
+      - name: Renderi Zorla (Headless Mode)
         run: |
-          Xvfb :99 -screen 0 1280x1024x24 &
+          Xvfb :99 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset &
           export DISPLAY=:99
-          # Simdilik sadece motorun acilip acilmadigini test ediyoruz
+          export LIBGL_ALWAYS_SOFTWARE=1
+          sleep 5
           wine64 engine/Mine-imator.exe --help
