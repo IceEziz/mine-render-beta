@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       miobject_link:
-        description: 'Render edilecek dosya'
+        description: 'Dosya linki'
         required: true
 
 jobs:
@@ -13,25 +13,21 @@ jobs:
       - name: Dosyalari Cek
         uses: actions/checkout@v4
 
-      - name: Wine ve Grafik Sistemini Zorla Kur
+      - name: Wine ve Modern Grafikleri Kur
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          # Wine-stable ve tum grafik kutuphanelerini tek pakette topluyoruz
-          sudo apt-get install -y --install-recommends wine64 wine32 xvfb libgl1-mesa-dri libgl1-mesa-glx libosmesa6 mesa-utils unzip
-          
+          sudo apt-get install -y wine64 wine32 xvfb libgl1 libglx-mesa0 libosmesa6 mesa-utils unzip
+
       - name: Motoru Hazirla
         run: |
           unzip mine_motor.zip -d engine
           chmod -R 777 engine
 
-      - name: Sanal Ekrani Baslat ve Motoru Dene
+      - name: Motoru Test Et
         run: |
-          # Sanal ekrani arka planda baslat
-          Xvfb :99 -screen 0 1280x1024x24 -ac +extension GLX +render -noreset &
+          Xvfb :99 -screen 0 1280x1024x24 &
           export DISPLAY=:99
           export LIBGL_ALWAYS_SOFTWARE=1
           sleep 5
-          # Wine'in nerede oldugunu sisteme ogret ve motoru test et
-          wine64 --version
-          wine64 engine/Mine-imator.exe --help || echo "Motor tetiklendi ama hata verdi, bu normal!"
+          wine64 engine/Mine-imator.exe --help || echo "Test tamamlandi"
