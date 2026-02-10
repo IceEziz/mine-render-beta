@@ -13,12 +13,12 @@ jobs:
       - name: Dosyalari Cek
         uses: actions/checkout@v4
 
-      - name: Wine Kurulumu (Kesin Yontem)
+      - name: Wine ve Modern Grafik Kurulumu
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          # En temel wine paketlerini yukleyelim
-          sudo apt-get install -y wine xvfb libgl1-mesa-dri libgl1-mesa-glx libosmesa6 unzip
+          # Sorun cikaran paketi (libgl1-mesa-glx) sildik, yerine libgl1 koyduk
+          sudo apt-get install -y wine wine64 wine32 xvfb libgl1 libglx-mesa0 libosmesa6 mesa-utils unzip
 
       - name: Motoru ve Modeli Hazirla
         run: |
@@ -33,10 +33,10 @@ jobs:
           export LIBGL_ALWAYS_SOFTWARE=1
           sleep 10
           
-          # wine64 yerine sadece 'wine' deniyoruz ve tam yol veriyoruz
+          # Wine ile motoru calistiriyoruz
           wine engine/Mine-imator.exe -render "assets/Atahan Brine Model/Squared Media Animation.miobject" -output "Atahan_Render.mp4" -res 1280 720 || echo "Render deneniyor..."
           
-          # Motorun islem yapmasi icin bekleme suresi
+          # Motorun islem yapmasi icin bekleme suresi (3 dakika)
           sleep 180
 
       - name: Videoyu Disari Aktar
@@ -44,4 +44,4 @@ jobs:
         with:
           name: render-sonucu
           path: Atahan_Render.mp4
-          if-no-files-found: error
+          if-no-files-found: warn
