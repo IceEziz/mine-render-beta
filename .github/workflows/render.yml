@@ -1,0 +1,32 @@
+name: Mine-imator Beta Render
+on:
+  workflow_dispatch:
+    inputs:
+      miobject_link:
+        description: 'Render edilecek dosyanın linki'
+        required: true
+
+jobs:
+  render_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları ve Motoru Çek
+        uses: actions/checkout@v4
+
+      - name: Wine ve Ekran Taklitçisi Kur (Xvfb)
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y wine64 xvfb libgl1-mesa-glx mesa-utils unzip
+
+      - name: Motoru Hazırla
+        run: |
+          unzip mine_motor.zip -d engine
+          chmod -R 777 engine
+
+      - name: Render'ı Başlat
+        run: |
+          Xvfb :99 -screen 0 1280x1024x24 &
+          export DISPLAY=:99
+          # Simdilik sadece motorun acilip acilmadigini test ediyoruz
+          wine64 engine/Mine-imator.exe --help
